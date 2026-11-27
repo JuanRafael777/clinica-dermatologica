@@ -87,9 +87,18 @@ async function solicitar(ruta, metodo = 'GET', valores, archivo = false) {
 
 async function cargarDatos() {
   if (demo) return leerDemo();
-  const listas = await Promise.all(modulos.map(modulo => solicitar(modulo)));
-  if (!listas.every(Array.isArray)) throw new Error('El servidor debe devolver una lista por módulo.');
-  return Object.fromEntries(modulos.map((modulo, i) => [modulo, listas[i]]));
+  const resultado = { errores: {} };
+  await Promise.all(modulos.map(async modulo => {
+    try {
+      const filas = await solicitar(modulo);
+      if (!Array.isArray(filas)) throw new Error('Respuesta inesperada del servidor.');
+      resultado[modulo] = filas;
+    } catch (error) {
+      resultado[modulo] = [];
+      resultado.errores[modulo] = error.message;
+    }
+  }));
+  return resultado;
 }
 
 async function cambiarDatos(modulo, id, valores) {

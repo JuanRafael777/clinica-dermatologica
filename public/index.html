@@ -6,6 +6,7 @@
   <meta name="description" content="Conoce los tratamientos, precios y horarios de Dérmica, clínica dermatológica en La Vega.">
   <title>Dérmica · Clínica dermatológica</title>
   <link rel="stylesheet" href="css/styles.css">
+  <script defer src="js/catalogo.js"></script>
 </head>
 <body>
   <a class="skip" href="#principal">Saltar al contenido</a>
@@ -28,12 +29,12 @@
     <section id="servicios" class="section wrap" aria-labelledby="tratamientos">
       <p class="eyebrow">Catálogo de servicios</p>
       <h2 id="tratamientos">Tratamientos faciales</h2>
-      <div class="catalog">
-        <article><img src="img/limpieza.webp" alt="Limpieza con espuma y disco de algodón" width="500" height="500" loading="lazy"><h3>Limpieza facial</h3><p>Limpieza profunda de la piel.</p><footer><strong>RD$1,500.00</strong><span>60 min</span></footer></article>
-        <article><img src="img/peeling.webp" alt="Aplicación de peeling facial con una brocha" width="500" height="500" loading="lazy"><h3>Peeling químico</h3><p>Atención a manchas y textura de la piel.</p><footer><strong>RD$2,500.00</strong><span>45 min</span></footer></article>
-        <article><img src="img/acne.webp" alt="Evaluación de la piel con dermatoscopio" width="500" height="500" loading="lazy"><h3>Tratamiento para acné</h3><p>Consulta y cuidado de la piel con acné.</p><footer><strong>RD$3,000.00</strong><span>60 min</span></footer></article>
-        <article><img src="img/hidratacion.webp" alt="Aplicación de sérum hidratante con gotero" width="500" height="500" loading="lazy"><h3>Hidratación facial</h3><p>Sesión de hidratación profunda.</p><footer><strong>RD$1,800.00</strong><span>45 min</span></footer></article>
-      </div>
+      <p id="estado-catalogo" role="status">Cargando tratamientos…</p>
+      <div class="catalog" id="catalogo"></div>
+      <template id="tarjeta">
+        <article><img alt="" width="500" height="500" loading="lazy"><h3></h3><p></p>
+          <footer><strong></strong><span></span></footer></article>
+      </template>
     </section>
     <section class="info" aria-label="Información de la clínica">
       <div class="wrap details">

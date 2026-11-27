@@ -23,6 +23,12 @@ function mostrarImporte() {
 
 function listarConfirmadas() {
   turno.replaceChildren(new Option('Selecciona una cita',''));
+  const falta = modulos.find(nombre => datos.errores?.[nombre]);
+  if (falta) {
+    $('#emitir').disabled = true;
+    $('#resumen').textContent = 'Para registrar la consulta se necesita cargar ' + falta + ': ' + datos.errores[falta];
+    return;
+  }
   for (const cita of datos.citas.filter(c => c.estado === 'Confirmada')) {
     const texto = [valorVisible(cita,'fecha'), valorVisible(cita,'hora'), valorVisible(cita,'paciente_id')].join(' · ');
     turno.add(new Option(texto,cita.id));

@@ -53,6 +53,17 @@ function dibujar() {
   });
   const titulos = [...campos[modulo].map(c => c[1]), 'Acciones'];
   $('#columnas').replaceChildren(...titulos.map(t => elemento('th',t)));
+  const requeridos = modulo === 'citas' ? modulos : [modulo];
+  const falta = requeridos.find(nombre => datos.errores?.[nombre]);
+  $('#nuevo').disabled = Boolean(falta);
+  $('#reintentar').hidden = !falta;
+  $('#aviso').textContent = falta ? 'No se pudo cargar ' + falta + ': ' + datos.errores[falta] : '';
+  if (falta) {
+    $('#filas').replaceChildren();
+    $('#cantidad').textContent = '';
+    $('#vacio').hidden = true;
+    return;
+  }
   const termino = normalizar($('#buscar').value.trim());
   const filas = datos[modulo].filter(f => campos[modulo].some(([clave]) => normalizar(valorVisible(f,clave)).includes(termino)));
   if (modulo === 'citas') filas.sort((a,b) => (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
@@ -117,6 +128,15 @@ function abrir(fila = {}, borrar = false) {
     etiqueta.append(control);
     $('#campos').append(etiqueta);
   }
+  if (!borrar && modulo === 'tratamientos' && !demo) {
+    const etiqueta = elemento('label', 'Imagen del tratamiento (opcional)');
+    const archivo = document.createElement('input');
+    archivo.type = 'file';
+    archivo.id = 'foto-tratamiento';
+    archivo.accept = 'image/*,.heic,.heif,.tif,.tiff,.avif,.ico';
+    etiqueta.append(archivo);
+    $('#campos').append(etiqueta);
+  }
   dialogo.showModal();
 }
 
@@ -124,9 +144,7 @@ async function actualizar() {
   try {
     datos = await cargarDatos();
     dibujar();
-    $('#nuevo').disabled = false;
-    $('#reintentar').hidden = true;
-    return true;
+    return !$('#nuevo').disabled;
   } catch {
     datos = null;
     $('#filas').replaceChildren();
@@ -156,6 +174,8 @@ formulario.addEventListener('submit', async evento => {
   }
   $('#guardar').disabled = true;
   try {
+    const foto = document.querySelector('#foto-tratamiento')?.files[0];
+    if (foto) valores.imagen = await leerImagen(foto);
     await cambiarDatos(modulo,idActual,valores);
     dialogo.close();
     if (await actualizar()) $('#aviso').textContent = eliminar ? 'Registro eliminado.' : 'Cambios guardados.';
@@ -184,3 +204,30 @@ if (demo || localStorage.getItem('token')) {
   $('#modo').textContent = demo ? '' : 'Acceso del personal';
   actualizar();
 } else location.replace('login.html');
+
+// Los formatos que reconoce el navegador se reducen antes de enviarlos.
+async function leerImagen(archivo) {
+  if (archivo.size > 12 * 1024 * 1024) throw new Error('Elige una imagen de hasta 12 MB.');
+  let fuente = archivo;
+  let mapa;
+  try {
+    mapa = await createImageBitmap(archivo);
+    const lienzo = document.createElement('canvas');
+    lienzo.width = 700;
+    lienzo.height = 500;
+    const escala = Math.max(700 / mapa.width, 500 / mapa.height);
+    const ancho = 700 / escala, alto = 500 / escala;
+    lienzo.getContext('2d').drawImage(mapa, (mapa.width-ancho)/2, (mapa.height-alto)/2, ancho, alto, 0,0,700,500);
+    fuente = await new Promise(resolve => lienzo.toBlob(resolve, 'image/webp', 0.92)) || archivo;
+  } catch {
+    // TIFF y HEIC pueden requerir el decodificador del servidor.
+  } finally {
+    mapa?.close();
+  }
+  return new Promise((resolve,reject) => {
+    const lector = new FileReader();
+    lector.onload = () => resolve(lector.result.split(',')[1]);
+    lector.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+    lector.readAsDataURL(fuente);
+  });
+}
