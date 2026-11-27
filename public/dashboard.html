@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de gestión · Dérmica</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/panel.css">
+  <script defer src="js/datos.js"></script>
+  <script defer src="js/dashboard.js"></script>
+  <script defer src="js/vendor/jspdf.umd.min.js"></script>
+  <script defer src="js/consultas.js"></script>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="bar wrap">
+    <a class="brand" href="index.html">Dérmica<span>Clínica dermatológica</span></a>
+    <button class="staff" id="salir" type="button">Salir del panel</button>
+  </header>
+  <main class="wrap" id="contenido">
+    <header class="panel-head">
+      <div><p class="eyebrow">Administración clínica</p><h1>Panel de gestión</h1></div>
+      <p id="modo"></p>
+    </header>
+    <nav class="modules" aria-label="Módulos del panel">
+      <button type="button" data-modulo="pacientes">Pacientes</button>
+      <button type="button" data-modulo="tratamientos">Tratamientos</button>
+      <button type="button" data-modulo="citas">Citas</button>
+      <button type="button" data-vista="consulta">Consulta y facturación</button>
+      <button type="button" data-vista="reportes">Reportes</button>
+    </nav>
+    <section class="workspace" aria-labelledby="titulo">
+      <div class="tools"><h2 id="titulo">Pacientes</h2><button id="nuevo" class="button" disabled>Agregar paciente</button></div>
+      <div class="tools search-row">
+        <input type="search" id="buscar" aria-label="Buscar registros" placeholder="Buscar por nombre o cédula">
+        <span id="cantidad" aria-live="polite"></span>
+      </div>
+      <p class="notice" role="status" id="aviso"></p>
+      <button id="reintentar" class="staff" hidden>Volver a cargar</button>
+      <table><caption class="sr" id="leyenda">Pacientes</caption><thead><tr id="columnas"></tr></thead><tbody id="filas"></tbody></table>
+      <p id="vacio" hidden></p>
+    </section>
+    <section id="consulta" class="workspace" hidden>
+      <h2>Consulta y facturación</h2>
+      <form id="facturar">
+        <label for="turno">Cita confirmada</label><select id="turno" required></select>
+        <div id="resumen" aria-live="polite"></div>
+        <label for="diagnostico">Diagnóstico</label><textarea id="diagnostico" rows="3" required></textarea>
+        <label for="receta">Receta (opcional)</label><textarea id="receta" rows="2"></textarea>
+        <button class="button" id="emitir">Registrar consulta</button>
+      </form>
+      <p role="status" id="resultado"></p>
+    </section>
+    <section id="reportes" class="workspace" hidden>
+      <h2>Reporte de citas</h2><p>Descarga la agenda con pacientes, tratamientos, horarios y estados.</p>
+      <form id="exportar"><label for="formato">Formato del reporte</label>
+        <select id="formato"><option value="excel">Excel</option><option value="pdf">PDF</option></select>
+        <button class="button">Descargar reporte</button>
+      </form><p id="descarga" role="status"></p>
+    </section>
+  </main>
+  <dialog id="editor" aria-labelledby="accion">
+    <form id="registro">
+      <h2 id="accion"></h2>
+      <div id="campos"></div>
+      <p id="error" role="alert"></p>
+      <div class="actions"><button type="button" class="staff" id="volver">Volver</button><button class="button" id="guardar">Guardar</button></div>
+    </form>
+  </dialog>
+</body>
+</html>
